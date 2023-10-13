@@ -8,6 +8,9 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "Player.h"
+#include "Skydome.h"
+#include <memory>
 
 /// <summary>
 /// ゲームシーン
@@ -52,9 +55,21 @@ private: // メンバ変数
 	//プレイヤーテクスチャハンドル
 	uint32_t Player_ = 0;
 	//3Dモデル
-	Model* model_ = nullptr;
+	/*Model* model_ = nullptr;*/
+	std::unique_ptr<Model> model_ = nullptr;
 	//ワールドトランスフォーム
 	WorldTransform worldTransform_;
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
+	// 自キャラ
+	/*Player* player_ = nullptr;*/
+	std::unique_ptr<Player> player_ = nullptr;
+
+	//天球テクスチャハンドル
+	uint32_t Skydome_ = 0;
+	//天球3Dモデル
+	/*Model* modelSkydome_ = nullptr;*/
+	std::unique_ptr<Model> modelSkydome_ = nullptr;
+	//天球
+	std::unique_ptr<Skydome> skydome_ = nullptr;
 };
