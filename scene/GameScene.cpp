@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Skydome.h"
 #include "AxisIndicator.h"
+#include "Ground.h"
 
 GameScene::GameScene() {}
 
@@ -18,6 +19,8 @@ void GameScene::Initialize() {
 	Player_ = TextureManager::Load("./Resources/kasu.png");
 	// 天球の読み込み
 	Skydome_ = TextureManager::Load("./Resources/skydome/uvChecker.png");
+	//地面の読み込み
+	Ground_ = TextureManager::Load("./Resources/ground/ground.png");
 	//3Dモデルの生成
 	model_.reset(Model::Create());
 	//ワールドトランスフォームの初期化
@@ -26,9 +29,9 @@ void GameScene::Initialize() {
 	viewProjection_.Initialize();
 	// 自キャラの生成
 	/*player_ = new Player();*/
-	player_ = std::make_unique<Player>();
+	/*player_ = std::make_unique<Player>();*/
 	//自キャラの初期化
-	player_->Initialize(model_.get(),Player_);
+	/*player_->Initialize(model_.get(),Player_);*/
 
 	// 天球の生成
 	/*skydome_ = new Skydome();*/
@@ -43,17 +46,39 @@ void GameScene::Initialize() {
 	// 軸方向が表示が参照するビュープロジェクションを指定する(アドレス渡し)
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 
+	//デバッグカメラの生成
+	/*debugCamera_ = new DebugCamera(1280, 720);*/
+	debugCamera_ = std::make_unique<DebugCamera>(1260, 720);
+
+	// 地面の生成
+	ground_ = std::make_unique<Ground>();
+	//地面3Dモデルの生成
+	modelGround_.reset(Model::CreateFromOBJ("ground", true));
+	//地面の初期化
+	ground_->Initialize(modelGround_.get(), Ground_);
+
+	//プレイヤーの生成
+	player_ = std::make_unique<Player>();
+	//自キャラ3Dモデルの生成
+	modelPlayer_.reset(Model::CreateFromOBJ("AL4Player", true));
+	//自キャラの初期化
+	player_->Initialize(modelPlayer_.get(), Player_);
 }
 
 void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
+	//デバッグカメラの更新
+	debugCamera_->Update();
 }
 
 void GameScene::Draw() {
 
 	// コマンドリストの取得
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
+
+	//デバッグカメラ
+	/*model_->Draw(worldTransform_, debugCamera_->GetViewProjection(), Player_);*/
 
 #pragma region 背景スプライト描画
 	// 背景スプライト描画前処理
@@ -83,6 +108,8 @@ void GameScene::Draw() {
 	player_->Draw(viewProjection_);
 	//天球の描画
 	skydome_->Draw(viewProjection_);
+	//地面の描画
+	ground_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();

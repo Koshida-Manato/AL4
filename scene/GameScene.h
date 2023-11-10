@@ -11,6 +11,8 @@
 #include "Player.h"
 #include "Skydome.h"
 #include <memory>
+#include "DebugCamera.h"
+#include "Ground.h"
 
 /// <summary>
 /// ゲームシーン
@@ -53,7 +55,7 @@ private: // メンバ変数
 	/// </summary>
 	
 	//プレイヤーテクスチャハンドル
-	uint32_t Player_ = 0;
+	/*uint32_t Player_ = 0;*/
 	//3Dモデル
 	/*Model* model_ = nullptr;*/
 	std::unique_ptr<Model> model_ = nullptr;
@@ -63,7 +65,7 @@ private: // メンバ変数
 	ViewProjection viewProjection_;
 	// 自キャラ
 	/*Player* player_ = nullptr;*/
-	std::unique_ptr<Player> player_ = nullptr;
+	/*std::unique_ptr<Player> player_ = nullptr;*/
 
 	//天球テクスチャハンドル
 	uint32_t Skydome_ = 0;
@@ -72,4 +74,22 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelSkydome_ = nullptr;
 	//天球
 	std::unique_ptr<Skydome> skydome_ = nullptr;
+
+	//デバッグカメラ
+	/*DebugCamera* debugCamera_ = nullptr;*/
+	std::unique_ptr<DebugCamera> debugCamera_ = nullptr;
+
+	//地面テクスチャハンドル
+	uint32_t Ground_ = 0;
+	//地面3Dモデル
+	std::unique_ptr<Model> modelGround_ = nullptr;
+	//地面
+	std::unique_ptr<Ground> ground_ = nullptr;
+
+	//自キャラテクスチャハンドル
+	uint32_t Player_ = 0;
+	//自キャラ3Dモデル
+	std::unique_ptr<Model> modelPlayer_ = nullptr;
+	//自キャラ
+	std::unique_ptr<Player> player_ = nullptr;
 };
