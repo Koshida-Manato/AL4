@@ -15,54 +15,63 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
-	//プレイヤーテクスチャ読み込み
+	// プレイヤーテクスチャ読み込み
 	Player_ = TextureManager::Load("./Resources/kasu.png");
 	// 天球の読み込み
 	Skydome_ = TextureManager::Load("./Resources/skydome/uvChecker.png");
-	//地面の読み込み
+	// 地面の読み込み
 	Ground_ = TextureManager::Load("./Resources/ground/ground.png");
-	//3Dモデルの生成
+	// 3Dモデルの生成
 	model_.reset(Model::Create());
-	//ワールドトランスフォームの初期化
+	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
-	//ビュープロジェクションの初期化
+	// ビュープロジェクションの初期化
 	viewProjection_.Initialize();
 	// 自キャラの生成
 	/*player_ = new Player();*/
 	/*player_ = std::make_unique<Player>();*/
-	//自キャラの初期化
+	// 自キャラの初期化
 	/*player_->Initialize(model_.get(),Player_);*/
 
 	// 天球の生成
 	/*skydome_ = new Skydome();*/
 	skydome_ = std::make_unique<Skydome>();
-	//天球3Dモデルの生成
+	// 天球3Dモデルの生成
 	modelSkydome_.reset(Model::CreateFromOBJ("skydome", true));
 	// 天球の初期化
 	skydome_->Initialize(modelSkydome_.get(), Skydome_);
+
+	// 追従カメラの生成
+	followCamera_ = std::make_unique<FollowCamera>();
+	//追従カメラの初期化
+	followCamera_->Initialize();
 
 	// 軸方向表示の表示を有効にする
 	AxisIndicator::GetInstance()->SetVisible(true);
 	// 軸方向が表示が参照するビュープロジェクションを指定する(アドレス渡し)
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 
-	//デバッグカメラの生成
+	// デバッグカメラの生成
 	/*debugCamera_ = new DebugCamera(1280, 720);*/
 	debugCamera_ = std::make_unique<DebugCamera>(1260, 720);
 
 	// 地面の生成
 	ground_ = std::make_unique<Ground>();
-	//地面3Dモデルの生成
+	// 地面3Dモデルの生成
 	modelGround_.reset(Model::CreateFromOBJ("ground", true));
-	//地面の初期化
+	// 地面の初期化
 	ground_->Initialize(modelGround_.get(), Ground_);
 
-	//プレイヤーの生成
+	// 自キャラの生成
 	player_ = std::make_unique<Player>();
-	//自キャラ3Dモデルの生成
+	// 自キャラ3Dモデルの生成
 	modelPlayer_.reset(Model::CreateFromOBJ("AL4Player", true));
-	//自キャラの初期化
+	// 自キャラの初期化
 	player_->Initialize(modelPlayer_.get(), Player_);
+
+
+	// 自キャラのワールドトランスフォームを追従カメラにセット
+	followCamera_->SetTarget(&player_->GetWorldTransform());
 }
 
 void GameScene::Update() {
@@ -70,6 +79,12 @@ void GameScene::Update() {
 	player_->Update();
 	//デバッグカメラの更新
 	debugCamera_->Update();
+	//追従カメラの更新
+	followCamera_->Update();
+
+	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+	viewProjection_.matView = followCamera_->GetViewProjection().matView;
+	viewProjection_.TransferMatrix();
 }
 
 void GameScene::Draw() {

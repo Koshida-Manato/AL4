@@ -13,6 +13,7 @@
 #include <memory>
 #include "DebugCamera.h"
 #include "Ground.h"
+#include "FollowCamera.h"
 
 /// <summary>
 /// ゲームシーン
@@ -92,4 +93,7 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelPlayer_ = nullptr;
 	//自キャラ
 	std::unique_ptr<Player> player_ = nullptr;
+
+	//フォローカメラ
+	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
 };

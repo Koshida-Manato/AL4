@@ -194,11 +194,11 @@ Vector3 Subtract(Vector3 vector1, Vector3 vector2) {
 	return result;
 }
 
-Vector3 VectorMultiply(Vector3 vector1, Vector3 vector2) {
+Vector3 VectorMultiply(float scaler, Vector3 v1) {
 	Vector3 result;
-	result.x = vector1.x * vector2.x;
-	result.y = vector1.y * vector2.y;
-	result.z = vector1.z * vector2.z;
+	result.x = v1.x * scaler;
+	result.y = v1.y * scaler;
+	result.z = v1.z * scaler;
 	return result;
 };
 
@@ -215,11 +215,13 @@ float Length(Vector3 v) {
 }
 
 Vector3 Normalize(const Vector3& v) {
-	Vector3 result;
-	result.x = v.x / Length(v);
-	result.y = v.y / Length(v);
-	result.z = v.z / Length(v);
-
+	float len = Length(v);
+	Vector3 result = v;
+	if (len != 0) {
+		result.x /= len;
+		result.y /= len;
+		result.z /= len;
+	}
 	return result;
 }
 
@@ -336,5 +338,78 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	                 (m.m[0][0] * m.m[1][1] * m.m[2][2] + m.m[0][1] * m.m[1][2] * m.m[2][0] +
 	                  m.m[0][2] * m.m[1][0] * m.m[2][1] - m.m[0][2] * m.m[1][1] * m.m[2][0] -
 	                  m.m[0][1] * m.m[1][0] * m.m[2][2] - m.m[0][0] * m.m[1][2] * m.m[2][1]);
+	return result;
+}
+Matrix4x4 MakeRotateXmatrix(float radian) {
+	Matrix4x4 result;
+	result.m[0][0] = 1.0f;
+	result.m[0][1] = 0.0f;
+	result.m[0][2] = 0.0f;
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = 0.0f;
+	result.m[1][1] = std::cos(radian);
+	result.m[1][2] = std::sin(radian);
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = 0.0f;
+	result.m[2][1] = -std::sin(radian);
+	result.m[2][2] = std::cos(radian);
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
+	return result;
+}
+
+// Y軸回転行列
+Matrix4x4 MakeRotateYmatrix(float radian) {
+	Matrix4x4 result;
+	result.m[0][0] = std::cos(radian);
+	result.m[0][1] = 0.0f;
+	result.m[0][2] = -std::sin(radian);
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = 0.0f;
+	result.m[1][1] = 1.0f;
+	result.m[1][2] = 0.0f;
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = std::sin(radian);
+	result.m[2][1] = 0.0f;
+	result.m[2][2] = std::cos(radian);
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
+	return result;
+}
+
+// Z軸回転行列
+Matrix4x4 MakeRotateZmatrix(float radian) {
+	Matrix4x4 result;
+	result.m[0][0] = std::cos(radian);
+	result.m[0][1] = std::sin(radian);
+	result.m[0][2] = 0.0f;
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = -std::sin(radian);
+	result.m[1][1] = std::cos(radian);
+	result.m[1][2] = 0.0f;
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = 0.0f;
+	result.m[2][1] = 0.0f;
+	result.m[2][2] = 1.0f;
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
 	return result;
 }
