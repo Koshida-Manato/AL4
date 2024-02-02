@@ -94,6 +94,12 @@ private: // メンバ変数
 	//自キャラ
 	std::unique_ptr<Player> player_ = nullptr;
 
+	//3Dモデル
+	std::unique_ptr<Model> modelFighterBody_;
+	std::unique_ptr<Model> modelFighterHead_;
+	std::unique_ptr<Model> modelFighterL_arm_;
+	std::unique_ptr<Model> modelFighterR_arm_;
+
 	//フォローカメラ
 	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
 };

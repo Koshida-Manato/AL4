@@ -65,13 +65,18 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	// 自キャラ3Dモデルの生成
-	modelPlayer_.reset(Model::CreateFromOBJ("AL4Player", true));
-	// 自キャラの初期化
-	player_->Initialize(modelPlayer_.get(), Player_);
-
-
+	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
+	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
+	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
+	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
 	// 自キャラのワールドトランスフォームを追従カメラにセット
 	followCamera_->SetTarget(&player_->GetWorldTransform());
+	// Player&followCamera
+	player_->SetViewProjection(&followCamera_->GetViewProjection());
+	// 自キャラの初期化
+	player_->Initialize(
+	    modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(),
+	    modelFighterR_arm_.get());
 }
 
 void GameScene::Update() {

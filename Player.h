@@ -1,9 +1,11 @@
 ﻿#pragma once
 
-#include "WorldTransform.h"
-#include "ViewProjection.h"
 #include "Model.h"
-#include "Input.h"
+#include "ViewProjection.h"
+#include "WorldTransform.h"
+#define _USE_MATH_DEFINES
+#include<math.h>
+#include<Input.h>
 
 /// <summary>
 /// 自キャラ
@@ -13,7 +15,7 @@ class Player {
 		/// <summary>
 		/// 自キャラ
 		/// </summary>
-		void Initialize(Model* model, uint32_t textureHandle);
+		void Initialize(Model* modelBody,Model*modelHead,Model*modelL_arm_,Model*modelR_arm);
 
 		/// <summary>
 		/// 自キャラ
@@ -25,17 +27,42 @@ class Player {
 		/// </summary>
 		void Draw(ViewProjection& viewProjection);
 
-		const WorldTransform& GetWorldTransform();
+		const WorldTransform& GetWorldTransform(){ 
+			return worldTransform_;
+		};
+
+		void SetViewProjection(const ViewProjection* viewProjection) {
+		    viewProjection_ = viewProjection;
+	    }
+
+		//浮遊ギミック初期化
+	    void InitializeFloatingGimmick();
+
+		//浮遊ギミック更新
+	    void UpdateFloatingGimmick();
 
 	private:
+		//ワールド変換データ
+	    WorldTransform worldTransform_;
+	    WorldTransform worldTransformBody_;
+	    WorldTransform worldTransformHead_;
+	    WorldTransform worldTransformL_arm;
+	    WorldTransform worldTransformR_arm;
 	    // カメラのビュープロジェクション
 	    const ViewProjection* viewProjection_ = nullptr;
-		//ワールド変換データ
-		WorldTransform worldTransform_;
 		//モデル
 		Model* model_ = nullptr;
 		//テクスチャハンドル
-		uint32_t player_ = 0u;
+		/*uint32_t player_ = 0u;*/
+
+		//3Dモデル
+	    Model* modelFighterBody_;
+	    Model* modelFighterHead_;
+	    Model* modelFighterL_arm_;
+	    Model* modelFighterR_arm_;
 
 	    Input* input_ = nullptr;
+
+		//浮遊ギミックの媒介変数
+	    float floatingParameter_ = 0.0f;
 };
