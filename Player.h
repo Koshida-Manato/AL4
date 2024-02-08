@@ -7,6 +7,12 @@
 #include<math.h>
 #include<Input.h>
 
+//振る舞い
+enum class Behavior {
+	kRoot, //通常状態
+	kJump, //ジャンプ中
+};
+
 /// <summary>
 /// 自キャラ
 /// </summary>
@@ -40,6 +46,12 @@ class Player {
 
 		//浮遊ギミック更新
 	    void UpdateFloatingGimmick();
+
+		//ジャンプ行動初期化
+	    void BehaviorJumpInitialize();
+
+		//ジャンプ行動更新
+	    void BehaviorJumpUpdate();
 
 	private:
 		//ワールド変換データ
