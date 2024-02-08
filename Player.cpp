@@ -52,13 +52,12 @@ void Player::Update() {
 		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX * speed};
 		// 移動量に速さを反映
 		move = VectorMultiply(speed, Normalize(move));
+		move = TransformNormal(move, MakeRotateYMatrix(viewProjection_->rotation_.y));
 		// 移動
 		worldTransform_.translation_ = Add(worldTransform_.translation_, move);
 
 		// カメラの角度から回転行列を計算する
-		Matrix4x4 rotateYMatrix = MakeRotateYMatrix(viewProjection_->rotation_.y);
-		// カメラとリンク
-		move = TransformNormal(move, MakeRotateYMatrix(viewProjection_->rotation_.y));
+		/*Matrix4x4 rotateYMatrix = MakeRotateYMatrix(viewProjection_->rotation_.y);*/
 
 		if (move.z != 0 || move.y != 0) {
 			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
@@ -87,7 +86,7 @@ void Player::UpdateFloatingGimmick() {
 	// 2πwを超えたら0に戻す
 	floatingParameter_ = std::fmod(floatingParameter_, 2.0f * (float)M_PI);
 	// 浮遊の振幅
-	const float Amplitude = 1.2f;
+	const float Amplitude = 0.3f;
 	// 浮遊を座標に反映
 	worldTransform_.translation_.y = std::sin(floatingParameter_) * Amplitude;
 }

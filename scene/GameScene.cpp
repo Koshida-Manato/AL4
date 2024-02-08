@@ -71,7 +71,6 @@ void GameScene::Initialize() {
 	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
 	// 自キャラのワールドトランスフォームを追従カメラにセット
 	followCamera_->SetTarget(&player_->GetWorldTransform());
-	// Player&followCamera
 	player_->SetViewProjection(&followCamera_->GetViewProjection());
 	// 自キャラの初期化
 	player_->Initialize(
@@ -89,6 +88,7 @@ void GameScene::Update() {
 
 	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 	viewProjection_.matView = followCamera_->GetViewProjection().matView;
+
 	viewProjection_.TransferMatrix();
 }
 

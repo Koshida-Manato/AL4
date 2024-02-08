@@ -5,6 +5,7 @@ FollowCamera::FollowCamera() {}
 void FollowCamera::Initialize() { 
 	worldTransform_.Initialize();
 	viewProjection_.Initialize();
+	input_ = Input::GetInstance();
 }
 
 void FollowCamera::Update() {

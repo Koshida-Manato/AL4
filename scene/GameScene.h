@@ -64,10 +64,6 @@ private: // メンバ変数
 	WorldTransform worldTransform_;
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
-	// 自キャラ
-	/*Player* player_ = nullptr;*/
-	/*std::unique_ptr<Player> player_ = nullptr;*/
-
 	//天球テクスチャハンドル
 	uint32_t Skydome_ = 0;
 	//天球3Dモデル

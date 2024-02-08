@@ -8,7 +8,7 @@ Matrix4x4 Initialize() {
 	return matInitialize;
 }
 Vector3 Add(Vector3 vector1, Vector3 vector2) {
-	Vector3 result;
+	Vector3 result = {0};
 	result.x = vector1.x + vector2.x;
 	result.y = vector1.y + vector2.y;
 	result.z = vector1.z + vector2.z;
@@ -182,8 +182,7 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 	Vector3 result{
 	    v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0],
 	    v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1],
-	    v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2],
-	};
+	    v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2]};
 	return result;
 }
 Vector3 Subtract(Vector3 vector1, Vector3 vector2) {
@@ -194,13 +193,13 @@ Vector3 Subtract(Vector3 vector1, Vector3 vector2) {
 	return result;
 }
 
-Vector3 VectorMultiply(float scaler, Vector3 v1) {
-	Vector3 result;
-	result.x = v1.x * scaler;
-	result.y = v1.y * scaler;
-	result.z = v1.z * scaler;
-	return result;
-};
+Vector3 VectorMultiply(float scalar, const Vector3& v1) {
+	Vector3 v;
+	v.x = v1.x * scalar;
+	v.y = v1.y * scalar;
+	v.z = v1.z * scalar;
+	return v;
+}
 
 float Dot(Vector3 vector1, Vector3 vector2) {
 	float v;
