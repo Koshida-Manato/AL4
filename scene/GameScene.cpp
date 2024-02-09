@@ -72,7 +72,7 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	// 自キャラ3Dモデルの生成
-	modelPlayer_.reset(Model::CreateFromOBJ("bottlePlayer", true));
+	//modelPlayer_.reset(Model::CreateFromOBJ("bottlePlayer", true));
 	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
 	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
