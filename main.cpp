@@ -6,6 +6,8 @@
 #include "PrimitiveDrawer.h"
 #include "TextureManager.h"
 #include "WinApp.h"
+#include "TitleScene.h"
+#include "ClearScene.h"
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -17,10 +19,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	AxisIndicator* axisIndicator = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 	GameScene* gameScene = nullptr;
+	TitleScene* titleScene = nullptr;
+	ClearScene* clearScene = nullptr;
 
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
-	win->CreateGameWindow(L"LE2C_06_コシダ_マナト_AL4");
+	win->CreateGameWindow(L"LE2C_06_コシダ_マナト_JUMP!");
 
 	// DirectX初期化処理
 	dxCommon = DirectXCommon::GetInstance();
@@ -61,6 +65,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	gameScene = new GameScene();
 	gameScene->Initialize();
 
+	// タイトルシーンの初期化
+	titleScene = new TitleScene();
+	titleScene->Initialize();
+
+	// クリアシーンの初期化
+	clearScene = new ClearScene;
+	clearScene->Initialize();
+
+	Scene scene = Scene::TITLE;
+
 	// メインループ
 	while (true) {
 		// メッセージ処理
@@ -72,17 +86,63 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		imguiManager->Begin();
 		// 入力関連の毎フレーム処理
 		input->Update();
-		// ゲームシーンの毎フレーム処理
-		gameScene->Update();
+		switch (scene) { 
+		case Scene::TITLE:
+			if (titleScene->IsSceneEnd() == true) {
+				// 次のシーンを値を代入してシーン切り替え
+				scene = titleScene->NextScene();
+				titleScene->Reset();
+			}
+
+			// タイトルシーンの毎フレーム処理
+			titleScene->Updata();
+
+			break;
+		case Scene::GAME:
+			// ゲームシーンの毎フレーム処理
+			gameScene->Update();
+			if (gameScene->IsSceneEnd() == true) {
+				// 次のシーンを値を代入してシーン切り替え
+				scene = gameScene->NextScene();
+				gameScene->Reset();
+			}
+			break;
+		case Scene::CLEAR:
+
+			if (clearScene->IsSceneEnd() == true) {
+				// 次のシーンを値を代入してシーン切り替え
+				scene = clearScene->NextScene();
+				clearScene->Reset();
+			}
+
+			// リザルトシーンの毎フレーム処理
+			clearScene->Updata();
+
+			break;
+		}
 		// 軸表示の更新
-		axisIndicator->Update();
+		/*axisIndicator->Update();*/
 		// ImGui受付終了
 		imguiManager->End();
-
 		// 描画開始
 		dxCommon->PreDraw();
-		// ゲームシーンの描画
-		gameScene->Draw();
+		switch (scene) {
+		case Scene::TITLE:
+			// タイトルシーンの描画
+			titleScene->Draw();
+
+			break;
+		case Scene::GAME:
+			// ゲームシーンの描画
+			gameScene->Draw();
+
+			break;
+		case Scene::CLEAR:
+			// リザルトシーンの描画
+			clearScene->Draw();
+
+			break;
+		}
 		// 軸表示の描画
 		axisIndicator->Draw();
 		// プリミティブ描画のリセット

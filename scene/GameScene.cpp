@@ -18,7 +18,7 @@ void GameScene::Initialize() {
 	// プレイヤーテクスチャ読み込み
 	Player_ = TextureManager::Load("./Resources/kasu.png");
 	// 天球の読み込み
-	Skydome_ = TextureManager::Load("./Resources/skydome/uvChecker.png");
+	Skydome_ = TextureManager::Load("./Resources/skydome/Back.png");
 	// 地面の読み込み
 	Ground_ = TextureManager::Load("./Resources/ground/ground.png");
 	// 3Dモデルの生成
@@ -62,9 +62,17 @@ void GameScene::Initialize() {
 	// 地面の初期化
 	ground_->Initialize(modelGround_.get(), Ground_);
 
+	//オブジェクトの生成
+	object_ = std::make_unique<Object>();
+	//3Dモデルの生成
+	modelObject_.reset(Model::CreateFromOBJ("object", true));
+	//オブジェクトの初期化
+	object_->Initialize(modelObject_.get());
+
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	// 自キャラ3Dモデルの生成
+	modelPlayer_.reset(Model::CreateFromOBJ("bottlePlayer", true));
 	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
 	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
@@ -85,11 +93,22 @@ void GameScene::Update() {
 	debugCamera_->Update();
 	//追従カメラの更新
 	followCamera_->Update();
+	//スカイドームの更新
+	skydome_->Update();
+	//オブジェクトの更新
+	object_->Update();
+
 
 	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 	viewProjection_.matView = followCamera_->GetViewProjection().matView;
 
 	viewProjection_.TransferMatrix();
+
+	if (player_->IsJumpEnd()==true) {
+			isSceneEnd = true;
+			Sleep(1 * 100);
+	}
+	
 }
 
 void GameScene::Draw() {
@@ -118,11 +137,11 @@ void GameScene::Draw() {
 	// 3Dオブジェクト描画前処理
 	Model::PreDraw(commandList);
 
-	/*/// <summary>
+	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	/// 3Dモデル描画
-	model_->Draw(worldTransform_, viewProjection_, Player_);*/
+	//3Dモデル描画
+	/*model_->Draw(worldTransform_, viewProjection_, Player_);*/
 
 	// 自キャラの描画
 	player_->Draw(viewProjection_);
@@ -130,6 +149,8 @@ void GameScene::Draw() {
 	skydome_->Draw(viewProjection_);
 	//地面の描画
 	ground_->Draw(viewProjection_);
+	//オブジェクトの描画
+	/*object_->Draw(viewProjection_);*/
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -147,4 +168,8 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+void GameScene::Reset() {
+	player_->Reset();
+	isSceneEnd = false;
 }

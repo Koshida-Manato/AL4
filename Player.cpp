@@ -1,8 +1,8 @@
 ﻿#include "Player.h"
 #include "MyMath.h"
 #include <cassert>
-void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm_, Model* modelR_arm_) { 
-
+void Player::Initialize(
+    Model* modelBody, Model* modelHead, Model* modelL_arm_, Model* modelR_arm_) { 
 
 	modelFighterBody_ = modelBody;
 	modelFighterHead_ = modelHead;
@@ -35,43 +35,81 @@ void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm_, 
 	worldTransformR_arm.scale_ = {1.0f, 1.0f, 1.0f};
 	worldTransformR_arm.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransformR_arm.translation_ = {0.5f, 1.25f, 0.0f};
+
 }
 
-void Player::Update() { 
-	XINPUT_STATE joyState;
-	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		// 速さ
-		const float speed = 0.3f;
-		worldTransformBody_.parent_ = &worldTransform_;
-		worldTransformHead_.parent_ = &worldTransform_;
-		worldTransformL_arm.parent_ = &worldTransform_;
-		worldTransformR_arm.parent_ = &worldTransform_;
-		// 移動量
-		Vector3 move = {
-		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX * speed, 0.0f,
-		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX * speed};
-		// 移動量に速さを反映
-		move = VectorMultiply(speed, Normalize(move));
-		move = TransformNormal(move, MakeRotateYMatrix(viewProjection_->rotation_.y));
-		// 移動
-		worldTransform_.translation_ = Add(worldTransform_.translation_, move);
-
-		// カメラの角度から回転行列を計算する
-		/*Matrix4x4 rotateYMatrix = MakeRotateYMatrix(viewProjection_->rotation_.y);*/
-
-		if (move.z != 0 || move.y != 0) {
-			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
+void Player::Update() {
+	if (behaviorRequest_) {
+		// 振る舞い変更
+		behavior_ = behaviorRequest_.value();
+		// 初期化実行
+		switch (behavior_) {
+		case Behavior::kRoot:
+		default:
+			BehaviorRootInitialize();
+		case Behavior::kJump:
+			BehaviorJumpInitialize();
+			break;
 		}
-	};
-
-	UpdateFloatingGimmick();
-
+		// 振る舞いリクエストをリセット
+		behaviorRequest_ = std::nullopt;
+	}
+	switch (behavior_) {
+	case Behavior::kRoot:
+	default:
+		BehaviorRootUpdate();
+		break;
+	case Behavior::kJump:
+		BehaviorJumpUpdate();
+		break;
+	}
+	worldTransformBody_.parent_ = &worldTransform_;
+	worldTransformHead_.parent_ = &worldTransform_;
+	worldTransformL_arm.parent_ = &worldTransform_;
+	worldTransformR_arm.parent_ = &worldTransform_;
 	// 行列の更新
 	worldTransform_.UpdateMatrix();
 	worldTransformBody_.UpdateMatrix();
 	worldTransformHead_.UpdateMatrix();
 	worldTransformL_arm.UpdateMatrix();
 	worldTransformR_arm.UpdateMatrix();
+}
+
+void Player::BehaviorRootUpdate() { 
+	BehaviorRootInitialize();
+	XINPUT_STATE joyState;
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		// 速さ
+		const float speed = 0.3f;
+		// 移動量
+		velocity_= {
+		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX * speed, 0.0f,
+		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX * speed};
+		// 移動量に速さを反映
+		velocity_ = VectorMultiply(speed, Normalize(velocity_));
+		velocity_ = TransformNormal(velocity_, MakeRotateYMatrix(viewProjection_->rotation_.y));
+		// 移動
+		worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
+
+		// カメラの角度から回転行列を計算する
+		/*Matrix4x4 rotateYMatrix = MakeRotateYMatrix(viewProjection_->rotation_.y);*/
+
+		if (velocity_.z != 0 || velocity_.y != 0) {
+			worldTransform_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
+		}
+	};
+
+	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+		if (joyState.Gamepad.wButtons == XINPUT_GAMEPAD_B&&jump<=5) {
+			// ジャンプリクエスト
+			behaviorRequest_ = Behavior::kJump;
+			jump++;
+			Sleep(1 * 300);
+		} else if (jump >= 6) {
+			isJumpEnd = true;
+		}
+	} 
+	UpdateFloatingGimmick();
 }
 
 void Player::InitializeFloatingGimmick() { floatingParameter_ = 0.0f; }
@@ -97,3 +135,36 @@ void Player::Draw(ViewProjection& viewProjection) {
 	modelFighterL_arm_->Draw(worldTransformL_arm, viewProjection);
 	modelFighterR_arm_->Draw(worldTransformR_arm, viewProjection);
 }
+
+void Player::Reset(){ 
+	jump = 0;
+	isJumpEnd = false;
+	Initialize(modelFighterBody_, modelFighterHead_, modelFighterL_arm_, modelFighterR_arm_);
+};
+
+void Player::BehaviorJumpInitialize(){ 
+	worldTransformBody_.translation_.y = 0; 
+	worldTransformL_arm.rotation_.x = 0;
+	worldTransformR_arm.rotation_.x = 0;
+	//ジャンプ初速
+	const float kJumpFirstSpeed = 1.0f;
+	//ジャンプ初速を与える
+	velocity_.y = kJumpFirstSpeed;
+};
+void Player::BehaviorRootInitialize(){};
+void Player::BehaviorJumpUpdate(){
+	//移動
+	worldTransform_.translation_ = Add(worldTransform_.translation_, velocity_);
+	//重力加速度
+	const float kGravityAcceleration = 0.05f;
+	//加速度ベクトル
+	Vector3 accelerationVector = {0, -kGravityAcceleration, 0};
+	//加速する
+	velocity_ = Add(accelerationVector,velocity_);
+	//着地
+	if (worldTransform_.translation_.y <= 0.0f) {
+		worldTransform_.translation_.y = 0;
+		//ジャンプ終了
+		behaviorRequest_ = Behavior::kRoot;
+	}
+};

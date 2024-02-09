@@ -6,6 +6,7 @@
 #define _USE_MATH_DEFINES
 #include<math.h>
 #include<Input.h>
+#include <optional>
 
 //振る舞い
 enum class Behavior {
@@ -21,7 +22,7 @@ class Player {
 		/// <summary>
 		/// 自キャラ
 		/// </summary>
-		void Initialize(Model* modelBody,Model*modelHead,Model*modelL_arm_,Model*modelR_arm);
+	    void Initialize(Model* modelfighterBody, Model* modelFighterHead, Model* modelFighterL_arm,Model* modelFighterR_arm);
 
 		/// <summary>
 		/// 自キャラ
@@ -47,11 +48,19 @@ class Player {
 		//浮遊ギミック更新
 	    void UpdateFloatingGimmick();
 
+		void Reset();
+
+		//通常初期化
+	    void BehaviorRootInitialize();
+	    void BehaviorRootUpdate();
 		//ジャンプ行動初期化
 	    void BehaviorJumpInitialize();
 
 		//ジャンプ行動更新
 	    void BehaviorJumpUpdate();
+
+
+		bool IsJumpEnd() { return isJumpEnd; }
 
 	private:
 		//ワールド変換データ
@@ -63,7 +72,7 @@ class Player {
 	    // カメラのビュープロジェクション
 	    const ViewProjection* viewProjection_ = nullptr;
 		//モデル
-		Model* model_ = nullptr;
+		Model* playerModel_ = nullptr;
 		//テクスチャハンドル
 		/*uint32_t player_ = 0u;*/
 
@@ -77,4 +86,14 @@ class Player {
 
 		//浮遊ギミックの媒介変数
 	    float floatingParameter_ = 0.0f;
+
+		//振る舞い
+	    Behavior behavior_ = Behavior::kRoot;
+		//振る舞いリクエスト
+	    std::optional<Behavior> behaviorRequest_ = std::nullopt;
+		//速度
+	    Vector3 velocity_ = {};
+
+		int jump = 0;
+	    bool isJumpEnd = false;
 };

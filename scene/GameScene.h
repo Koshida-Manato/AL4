@@ -13,7 +13,9 @@
 #include <memory>
 #include "DebugCamera.h"
 #include "Ground.h"
+#include "Scene.h"
 #include "FollowCamera.h"
+#include "Object.h"
 
 /// <summary>
 /// ゲームシーン
@@ -45,6 +47,12 @@ public: // メンバ関数
 	/// 描画
 	/// </summary>
 	void Draw();
+
+	bool IsSceneEnd() { return isSceneEnd; }
+
+	Scene NextScene() { return Scene::CLEAR; }
+
+	void Reset();
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -82,6 +90,11 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelGround_ = nullptr;
 	//地面
 	std::unique_ptr<Ground> ground_ = nullptr;
+	uint32_t Object_ = 0;
+	//オブジェクト3Dモデル
+	std::unique_ptr<Model> modelObject_ = nullptr;
+	//オブジェクト
+	std::unique_ptr<Object> object_ = nullptr;
 
 	//自キャラテクスチャハンドル
 	uint32_t Player_ = 0;
@@ -91,6 +104,7 @@ private: // メンバ変数
 	std::unique_ptr<Player> player_ = nullptr;
 
 	//3Dモデル
+	std::unique_ptr<Model> playerModel_;
 	std::unique_ptr<Model> modelFighterBody_;
 	std::unique_ptr<Model> modelFighterHead_;
 	std::unique_ptr<Model> modelFighterL_arm_;
@@ -98,4 +112,7 @@ private: // メンバ変数
 
 	//フォローカメラ
 	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
+
+	// シーンを終わらせるフラグ
+	bool isSceneEnd = false;
 };

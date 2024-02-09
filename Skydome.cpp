@@ -9,7 +9,7 @@ void Skydome::Initialize(Model* model, uint32_t Skydome) {
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
 
-	worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
+	worldTransform_.scale_ = {10.0f, 10.0f, 10.0f};
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 
@@ -17,7 +17,7 @@ void Skydome::Initialize(Model* model, uint32_t Skydome) {
 	worldTransform_.TransferMatrix();
 }
 
-void Skydome::Update() {}
+void Skydome::Update() { worldTransform_.UpdateMatrix(); }
 
 void Skydome::Draw(ViewProjection& viewProjection_) {
 	// 3Dモデル描画
