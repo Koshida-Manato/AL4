@@ -20,21 +20,21 @@ void Player::Initialize(
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 	// 体の初期化
-	worldTransformBody_.scale_ = {1.0f, 1.0f, 1.0f};
+	worldTransformBody_.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformBody_.rotation_ = {0.0f, 0.0f, 0.0f};
 	worldTransformBody_.translation_ = {0.0f, 0.0f, 0.0f};
 	// 頭の初期化
-	worldTransformHead_.scale_ = {1.0f, 1.0f, 1.0f};
+	worldTransformHead_.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformHead_.rotation_ = {0.0f, 0.0f, 0.0f};
-	worldTransformHead_.translation_ = {0.0f, 1.5f, 0.0f};
+	worldTransformHead_.translation_ = {0.0f, 0.0f, 0.0f};
 	// 左腕の初期化
-	worldTransformL_arm.scale_ = {1.0f, 1.0f, 1.0f};
+	worldTransformL_arm.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformL_arm.rotation_ = {0.0f, 0.0f, 0.0f};
-	worldTransformL_arm.translation_ = {-0.5f, 1.25f, 0.0f};
+	worldTransformL_arm.translation_ = {0.0f, 0.0f, 0.0f};
 	// 右腕の初期化
-	worldTransformR_arm.scale_ = {1.0f, 1.0f, 1.0f};
+	worldTransformR_arm.scale_ = {0.5f, 0.5f, 0.5f};
 	worldTransformR_arm.rotation_ = {0.0f, 0.0f, 0.0f};
-	worldTransformR_arm.translation_ = {0.5f, 1.25f, 0.0f};
+	worldTransformR_arm.translation_ = {0.0f, 0.0f, 0.0f};
 
 }
 
