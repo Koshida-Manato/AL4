@@ -84,6 +84,9 @@ void GameScene::Initialize() {
 	player_->Initialize(
 	    modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(),
 	    modelFighterR_arm_.get());
+
+	//フェードイン
+	uint32_t fadeTextureHandle = TextureManager::Load("fade.png")
 }
 
 void GameScene::Update() {

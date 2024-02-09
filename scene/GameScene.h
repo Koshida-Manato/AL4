@@ -110,6 +110,10 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelFighterL_arm_;
 	std::unique_ptr<Model> modelFighterR_arm_;
 
+	//フェードイン・アウト
+	Sprite* fadeSprite_ = nullptr;
+	Vector4 fadeColor_ = {1.0f, 1.0f, 1.0f, 1.0f};
+
 	//フォローカメラ
 	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
 
