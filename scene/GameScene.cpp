@@ -85,11 +85,28 @@ void GameScene::Initialize() {
 	    modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(),
 	    modelFighterR_arm_.get());
 
-	//フェードイン
-	uint32_t fadeTextureHandle = TextureManager::Load("fade.png")
+	fade_ = std::make_unique<Fade>();
+	fade_->Initialize();
 }
 
 void GameScene::Update() {
+	//更新処理
+	fade_->Update();
+	if (fadeinFlag == false) {
+		fade_->FadeInStart();
+		fadeinFlag = true;
+	}
+	if (finishFlag == true) {
+		if (fadeoutFlag == false) {
+			fade_->FadeOutStart();
+			fadeoutFlag = true;
+		}
+		fadeTimer++;
+	}
+	if (fadeTimer >= 100) {
+			isSceneEnd = true;
+			fadeinFlag = false;
+	}
 	// 自キャラの更新
 	player_->Update();
 	//デバッグカメラの更新
@@ -101,17 +118,14 @@ void GameScene::Update() {
 	//オブジェクトの更新
 	object_->Update();
 
-
 	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 	viewProjection_.matView = followCamera_->GetViewProjection().matView;
 
 	viewProjection_.TransferMatrix();
 
-	if (player_->IsJumpEnd()==true) {
-			isSceneEnd = true;
-			Sleep(1 * 100);
+	if (player_->IsJumpEnd() == true) {
+		finishFlag = true;
 	}
-	
 }
 
 void GameScene::Draw() {
@@ -152,8 +166,6 @@ void GameScene::Draw() {
 	skydome_->Draw(viewProjection_);
 	//地面の描画
 	ground_->Draw(viewProjection_);
-	//オブジェクトの描画
-	/*object_->Draw(viewProjection_);*/
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -167,6 +179,9 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
+	// フェード
+	fade_->Draw();
+
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
@@ -175,4 +190,6 @@ void GameScene::Draw() {
 void GameScene::Reset() {
 	player_->Reset();
 	isSceneEnd = false;
+	fadeinFlag = false;
+	fadeoutFlag = false;
 }

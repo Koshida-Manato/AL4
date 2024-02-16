@@ -16,6 +16,7 @@
 #include "Scene.h"
 #include "FollowCamera.h"
 #include "Object.h"
+#include "Fade.h"
 
 /// <summary>
 /// ゲームシーン
@@ -111,12 +112,20 @@ private: // メンバ変数
 	std::unique_ptr<Model> modelFighterR_arm_;
 
 	//フェードイン・アウト
-	Sprite* fadeSprite_ = nullptr;
-	Vector4 fadeColor_ = {1.0f, 1.0f, 1.0f, 1.0f};
+	/*Sprite* fadeSprite_ = nullptr;
+	Vector4 fadeColor_ = {1.0f, 1.0f, 1.0f, 1.0f};*/
+	std::unique_ptr<Fade> fade_ = nullptr;
 
 	//フォローカメラ
 	std::unique_ptr<FollowCamera> followCamera_ = nullptr;
 
 	// シーンを終わらせるフラグ
 	bool isSceneEnd = false;
+
+	//フラグ
+	bool fadeinFlag = false;
+	bool fadeoutFlag = false;
+
+	int fadeTimer = 0;
+	bool finishFlag = false;
 };
