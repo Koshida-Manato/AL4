@@ -192,4 +192,6 @@ void GameScene::Reset() {
 	isSceneEnd = false;
 	fadeinFlag = false;
 	fadeoutFlag = false;
+	finishFlag = false;
+	fadeTimer = 0;
 }
