@@ -1,18 +1,29 @@
 ﻿#pragma once
 
-#include "WorldTransform.h"
-#include "ViewProjection.h"
 #include "Model.h"
+#include "ViewProjection.h"
+#include "WorldTransform.h"
+#define _USE_MATH_DEFINES
+#include<math.h>
+#include<Input.h>
+#include <optional>
+#include "BaseCharacter.h"
+
+//振る舞い
+enum class Behavior {
+	kRoot, //通常状態
+	kJump, //ジャンプ中
+};
 
 /// <summary>
 /// 自キャラ
 /// </summary>
-class Player {
+class Player :public BaseCharacter {
 	public:
 		/// <summary>
 		/// 自キャラ
 		/// </summary>
-		void Initialize(Model* model, uint32_t textureHandle);
+	    void Initialize(Model* modelfighterBody, Model* modelFighterHead, Model* modelFighterL_arm,Model* modelFighterR_arm);
 
 		/// <summary>
 		/// 自キャラ
@@ -24,11 +35,72 @@ class Player {
 		/// </summary>
 		void Draw(ViewProjection& viewProjection);
 
+		const WorldTransform& GetWorldTransform(){ 
+			return worldTransform_;
+		};
+
+		void SetViewProjection(const ViewProjection* viewProjection) {
+		    viewProjection_ = viewProjection;
+	    }
+
+		//浮遊ギミック初期化
+	    void InitializeFloatingGimmick();
+
+		//浮遊ギミック更新
+	    void UpdateFloatingGimmick();
+
+		void Reset();
+
+		//通常初期化
+	    void BehaviorRootInitialize();
+	    void BehaviorRootUpdate();
+		//ジャンプ行動初期化
+	    void BehaviorJumpInitialize();
+
+		//ジャンプ行動更新
+	    void BehaviorJumpUpdate();
+
+		//衝突を検出しタラ呼び出されるコールバック関数
+	    void OnCollision() override;
+
+		//中心座標を取得
+	    Vector3 GetCenterPosition() const override;
+
+		bool IsEnd() { return isDead_; }
+
 	private:
 		//ワールド変換データ
-		WorldTransform worldTransform_;
+	    WorldTransform worldTransform_;
+	    WorldTransform worldTransformBody_;
+	    WorldTransform worldTransformHead_;
+	    WorldTransform worldTransformL_arm;
+	    WorldTransform worldTransformR_arm;
+	    // カメラのビュープロジェクション
+	    const ViewProjection* viewProjection_ = nullptr;
 		//モデル
-		Model* model_ = nullptr;
+		Model* playerModel_ = nullptr;
 		//テクスチャハンドル
-		uint32_t player_ = 0u;
+		/*uint32_t player_ = 0u;*/
+
+		//3Dモデル
+	    Model* modelFighterBody_;
+	    Model* modelFighterHead_;
+	    Model* modelFighterL_arm_;
+	    Model* modelFighterR_arm_;
+
+	    Input* input_ = nullptr;
+
+		//浮遊ギミックの媒介変数
+	    float floatingParameter_ = 0.0f;
+
+		//振る舞い
+	    Behavior behavior_ = Behavior::kRoot;
+		//振る舞いリクエスト
+	    std::optional<Behavior> behaviorRequest_ = std::nullopt;
+		//速度
+	    Vector3 velocity_ = {};
+
+		int jump = 0;
+	    bool isJumpEnd = false;
+	    bool isDead_ = false;
 };

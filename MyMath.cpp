@@ -1,5 +1,6 @@
 ﻿#include "MyMath.h"
 #include "math.h"
+#include <cassert>
 
 Matrix4x4 Initialize() {
 	Matrix4x4 matInitialize = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
@@ -8,10 +9,26 @@ Matrix4x4 Initialize() {
 	return matInitialize;
 }
 Vector3 Add(Vector3 vector1, Vector3 vector2) {
-	Vector3 result;
+	Vector3 result = {0};
 	result.x = vector1.x + vector2.x;
 	result.y = vector1.y + vector2.y;
 	result.z = vector1.z + vector2.z;
+	return result;
+}
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix) {
+	Vector3 result;
+	result.x = vector.x * matrix.m[0][0] + vector.y * matrix.m[1][0] + vector.z * matrix.m[2][0] +
+	           1.0f * matrix.m[3][0];
+	result.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] +
+	           1.0f * matrix.m[3][1];
+	result.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] +
+	           1.0f * matrix.m[3][2];
+	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] +
+	          1.0f * matrix.m[3][3];
+	assert(w != 0.0f);
+	result.x /= w;
+	result.y /= w;
+	result.z /= w;
 	return result;
 }
 // Matrix4x4 Multiply(Matrix4x4 m1, Matrix4x4 m2) {
@@ -182,8 +199,7 @@ Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m) {
 	Vector3 result{
 	    v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0],
 	    v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1],
-	    v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2],
-	};
+	    v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2]};
 	return result;
 }
 Vector3 Subtract(Vector3 vector1, Vector3 vector2) {
@@ -194,13 +210,13 @@ Vector3 Subtract(Vector3 vector1, Vector3 vector2) {
 	return result;
 }
 
-Vector3 VectorMultiply(Vector3 vector1, Vector3 vector2) {
-	Vector3 result;
-	result.x = vector1.x * vector2.x;
-	result.y = vector1.y * vector2.y;
-	result.z = vector1.z * vector2.z;
-	return result;
-};
+Vector3 VectorMultiply(float scalar, const Vector3& v1) {
+	Vector3 v;
+	v.x = v1.x * scalar;
+	v.y = v1.y * scalar;
+	v.z = v1.z * scalar;
+	return v;
+}
 
 float Dot(Vector3 vector1, Vector3 vector2) {
 	float v;
@@ -215,11 +231,13 @@ float Length(Vector3 v) {
 }
 
 Vector3 Normalize(const Vector3& v) {
-	Vector3 result;
-	result.x = v.x / Length(v);
-	result.y = v.y / Length(v);
-	result.z = v.z / Length(v);
-
+	float len = Length(v);
+	Vector3 result = v;
+	if (len != 0) {
+		result.x /= len;
+		result.y /= len;
+		result.z /= len;
+	}
 	return result;
 }
 
@@ -336,5 +354,78 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	                 (m.m[0][0] * m.m[1][1] * m.m[2][2] + m.m[0][1] * m.m[1][2] * m.m[2][0] +
 	                  m.m[0][2] * m.m[1][0] * m.m[2][1] - m.m[0][2] * m.m[1][1] * m.m[2][0] -
 	                  m.m[0][1] * m.m[1][0] * m.m[2][2] - m.m[0][0] * m.m[1][2] * m.m[2][1]);
+	return result;
+}
+Matrix4x4 MakeRotateXmatrix(float radian) {
+	Matrix4x4 result;
+	result.m[0][0] = 1.0f;
+	result.m[0][1] = 0.0f;
+	result.m[0][2] = 0.0f;
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = 0.0f;
+	result.m[1][1] = std::cos(radian);
+	result.m[1][2] = std::sin(radian);
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = 0.0f;
+	result.m[2][1] = -std::sin(radian);
+	result.m[2][2] = std::cos(radian);
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
+	return result;
+}
+
+// Y軸回転行列
+Matrix4x4 MakeRotateYmatrix(float radian) {
+	Matrix4x4 result;
+	result.m[0][0] = std::cos(radian);
+	result.m[0][1] = 0.0f;
+	result.m[0][2] = -std::sin(radian);
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = 0.0f;
+	result.m[1][1] = 1.0f;
+	result.m[1][2] = 0.0f;
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = std::sin(radian);
+	result.m[2][1] = 0.0f;
+	result.m[2][2] = std::cos(radian);
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
+	return result;
+}
+
+// Z軸回転行列
+Matrix4x4 MakeRotateZmatrix(float radian) {
+	Matrix4x4 result;
+	result.m[0][0] = std::cos(radian);
+	result.m[0][1] = std::sin(radian);
+	result.m[0][2] = 0.0f;
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = -std::sin(radian);
+	result.m[1][1] = std::cos(radian);
+	result.m[1][2] = 0.0f;
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = 0.0f;
+	result.m[2][1] = 0.0f;
+	result.m[2][2] = 1.0f;
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
 	return result;
 }
