@@ -13,6 +13,15 @@ void Enemy::Initialize(Model*modelEnemy) {
 void Enemy::Update() {
 
 	worldTransform_.parent_ = &worldTransform_;
+
+	Vector3 move = {0, 0, 1};
+
+	move = TransformNormal(move, worldTransform_.matWorld_);
+
+	worldTransform_.translation_ = Add(worldTransform_.translation_, move);
+
+	worldTransform_.rotation_.y += 0.05f;
+
 	// 行列の更新
 	worldTransform_.UpdateMatrix();
 }
