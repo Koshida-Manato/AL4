@@ -100,13 +100,11 @@ void Player::BehaviorRootUpdate() {
 	};
 
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		if (joyState.Gamepad.wButtons == XINPUT_GAMEPAD_B&&jump<=5) {
+		if (joyState.Gamepad.wButtons == XINPUT_GAMEPAD_B) {
 			// ジャンプリクエスト
 			behaviorRequest_ = Behavior::kJump;
-			jump++;
+			/*jump++;*/
 			Sleep(1 * 300);
-		} else if (jump >= 6) {
-			isJumpEnd = true;
 		}
 	} 
 	UpdateFloatingGimmick();
@@ -138,6 +136,7 @@ void Player::Draw(ViewProjection& viewProjection) {
 
 void Player::Reset(){ 
 	jump = 0;
+	isDead_ = false;
 	isJumpEnd = false;
 	Initialize(modelFighterBody_, modelFighterHead_, modelFighterL_arm_, modelFighterR_arm_);
 };
@@ -168,3 +167,13 @@ void Player::BehaviorJumpUpdate(){
 		behaviorRequest_ = Behavior::kRoot;
 	}
 };
+Vector3 Player::GetCenterPosition() const {
+	// ローカル座標のオフセット
+	const Vector3 offset = {0.0f, 1.5f, 0.0f};
+	// ワールド座標変換
+	Vector3 worldPos = Transform(offset, worldTransform_.matWorld_);
+
+	return worldPos;
+}
+
+void Player::OnCollision() { isDead_ = true; }

@@ -1,9 +1,9 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
-#include "Player.h"
 #include "Skydome.h"
 #include "AxisIndicator.h"
 #include "Ground.h"
+
 
 GameScene::GameScene() {}
 
@@ -14,9 +14,6 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
-
-	// プレイヤーテクスチャ読み込み
-	Player_ = TextureManager::Load("./Resources/kasu.png");
 	// 天球の読み込み
 	Skydome_ = TextureManager::Load("./Resources/skydome/Back.png");
 	// 地面の読み込み
@@ -72,7 +69,6 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	// 自キャラ3Dモデルの生成
-	//modelPlayer_.reset(Model::CreateFromOBJ("bottlePlayer", true));
 	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
 	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
@@ -87,6 +83,16 @@ void GameScene::Initialize() {
 
 	fade_ = std::make_unique<Fade>();
 	fade_->Initialize();
+
+	//敵のキャラ生成
+	enemy_ = std::make_unique<Enemy>();
+	//敵3Dモデルの生成
+	modelEnemy_.reset(Model::CreateFromOBJ("enemy", true));
+	//敵の初期化
+	enemy_->Initialize(modelEnemy_.get());
+
+	// 衝突マネージャの生成
+	collisionManager_ = std::make_unique<CollisionManager>();
 }
 
 void GameScene::Update() {
@@ -117,15 +123,31 @@ void GameScene::Update() {
 	skydome_->Update();
 	//オブジェクトの更新
 	object_->Update();
+	//敵の更新
+	enemy_->Update();
+
+	ChackAllCollisions();
 
 	viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
 	viewProjection_.matView = followCamera_->GetViewProjection().matView;
 
 	viewProjection_.TransferMatrix();
 
-	if (player_->IsJumpEnd() == true) {
+	if (player_->IsEnd() == true) {
 		finishFlag = true;
 	}
+}
+
+void GameScene::ChackAllCollisions() {
+	// 衝突マネージャのリセット
+	collisionManager_->Reset();
+	// コライダーをリストに登録
+	collisionManager_->AddCollider(player_.get());
+
+	collisionManager_->AddCollider(enemy_.get());
+
+	// 衝突判定と応答
+	collisionManager_->ChackAllCollisions();
 }
 
 void GameScene::Draw() {
@@ -166,6 +188,8 @@ void GameScene::Draw() {
 	skydome_->Draw(viewProjection_);
 	//地面の描画
 	ground_->Draw(viewProjection_);
+	//敵の描画
+	enemy_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -187,6 +211,8 @@ void GameScene::Draw() {
 
 #pragma endregion
 }
+
+
 void GameScene::Reset() {
 	player_->Reset();
 	isSceneEnd = false;

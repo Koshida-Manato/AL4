@@ -33,3 +33,4 @@ float Length(Vector3 v);
 Matrix4x4 MakeRotateXmatrix(float radian);
 Matrix4x4 MakeRotateYmatrix(float radian);
 Matrix4x4 MakeRotateZmatrix(float radian);
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix);

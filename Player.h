@@ -7,6 +7,7 @@
 #include<math.h>
 #include<Input.h>
 #include <optional>
+#include "BaseCharacter.h"
 
 //振る舞い
 enum class Behavior {
@@ -17,7 +18,7 @@ enum class Behavior {
 /// <summary>
 /// 自キャラ
 /// </summary>
-class Player {
+class Player :public BaseCharacter {
 	public:
 		/// <summary>
 		/// 自キャラ
@@ -59,8 +60,13 @@ class Player {
 		//ジャンプ行動更新
 	    void BehaviorJumpUpdate();
 
+		//衝突を検出しタラ呼び出されるコールバック関数
+	    void OnCollision() override;
 
-		bool IsJumpEnd() { return isJumpEnd; }
+		//中心座標を取得
+	    Vector3 GetCenterPosition() const override;
+
+		bool IsEnd() { return isDead_; }
 
 	private:
 		//ワールド変換データ
@@ -96,4 +102,5 @@ class Player {
 
 		int jump = 0;
 	    bool isJumpEnd = false;
+	    bool isDead_ = false;
 };
